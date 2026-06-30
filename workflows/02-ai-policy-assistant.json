@@ -1,0 +1,189 @@
+{
+  "name": "AI Policy Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -304,
+        416
+      ],
+      "id": "79ddbb5c-7b41-4146-8349-f1b7f4eb8b01",
+      "name": "When chat message received",
+      "webhookId": "77b5e6f7-876a-4c09-9bd5-679b494b3c61"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -96,
+        416
+      ],
+      "id": "0e4fb6c5-07b1-4344-8991-c41d81712d76",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        624
+      ],
+      "id": "1c971bac-6292-441e-88c3-dbb69b3351f0",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "b1xJMGBlEgI1uXxW",
+          "name": "Gemini - EPIP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 500
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.4,
+      "position": [
+        -96,
+        624
+      ],
+      "id": "359c3391-ab23-462d-a8d2-5d2e1fbe08d8",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "CvZE2I81NoWkIRYK",
+          "name": "Postgres - EPIP"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        224,
+        816
+      ],
+      "id": "1000a235-7fe4-4d75-a691-8248781c264b",
+      "name": "Embeddings Google Gemini1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "b1xJMGBlEgI1uXxW",
+          "name": "Gemini - EPIP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Search the enterprise policy knowledge base and retrieve the most relevant policy document chunks to answer the user's question.",
+        "tableName": {
+          "__rl": true,
+          "value": "policy_documents",
+          "mode": "list",
+          "cachedResultName": "policy_documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        128,
+        608
+      ],
+      "id": "d38539fd-a699-4c5c-a634-92111fd3429f",
+      "name": "Supabase Vector Store Retriever",
+      "credentials": {
+        "supabaseApi": {
+          "id": "IMWsTlmbyPa2nlwK",
+          "name": "Supabase - EPIP"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store Retriever",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store Retriever": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "52e0c333-7a7f-40c4-9c3a-59329657c8a2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0ad783b33be8e8eba7d65796cd4ab44d7869a8d0844d59185abfb522d754c9e6"
+  },
+  "nodeGroups": [],
+  "id": "aacwyZEPqplyLmcL",
+  "tags": []
+}

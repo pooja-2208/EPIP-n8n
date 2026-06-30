@@ -1,7 +1,6 @@
 # Milestone 02 – Policy Ingestion
 
 ## Objective
-
 Build an automated document ingestion pipeline that monitors Google Drive for newly uploaded policy documents, downloads the PDF files, extracts the document text, generates embeddings using Google Gemini, and stores the embeddings in a Supabase Vector Store.
 
 ## Completed
