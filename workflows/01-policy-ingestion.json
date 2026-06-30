@@ -1,0 +1,211 @@
+{
+  "name": "EPIP",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1YS7OLQRUGvcBcIiikBuzctLDz8rdfUcK",
+          "mode": "list",
+          "cachedResultName": "EPIP",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1YS7OLQRUGvcBcIiikBuzctLDz8rdfUcK"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -16
+      ],
+      "id": "cb44c790-bc96-476e-b98a-e2eabfeeac85",
+      "name": "Google Drive Trigger",
+      "retryOnFail": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Q2KMt4GbwDz6V9Ep",
+          "name": "Google Drive - EPIP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{$json.id}}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -112,
+        -16
+      ],
+      "id": "af63d80f-c090-435b-84e7-32069d509a37",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "Q2KMt4GbwDz6V9Ep",
+          "name": "Google Drive - EPIP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        -16
+      ],
+      "id": "39c50727-4986-42ef-86a7-96e1a1652abb",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        240,
+        176
+      ],
+      "id": "e24cb1c1-c17e-4392-9838-d32eaf63c59c",
+      "name": "Embeddings Google Gemini",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "b1xJMGBlEgI1uXxW",
+          "name": "Gemini - EPIP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        176
+      ],
+      "id": "f4ab797a-6156-4098-98ab-962b4edd0dd1",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "=policy_documents",
+          "mode": "id"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        -16
+      ],
+      "id": "94f659ea-fc8b-431b-9ca5-be0623071e15",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "IMWsTlmbyPa2nlwK",
+          "name": "Supabase - EPIP"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "4774cb4b-a985-41be-9a72-0b78409a215a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "0ad783b33be8e8eba7d65796cd4ab44d7869a8d0844d59185abfb522d754c9e6"
+  },
+  "nodeGroups": [],
+  "id": "aacwyZEPqplyLmcL",
+  "tags": []
+}
